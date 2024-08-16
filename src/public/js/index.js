@@ -1,6 +1,6 @@
 //import notificacionToastify from '../../utils/alertas.js'; 
 //import alertaPopUp from '../../utils/alertas.js'; 
-//import { notificacionToastify, alertaPopUp } from '../utils/alertas.js';  // Ajusta la ruta si es necesario
+//import { notificacionToastify, alertaPopUp } from '../utils/alertas.js';  
 const socket = io();  // Establecer la conexión con el servidor
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Mostrar alerta Swal al realizar el pago
         //alertaPopUp('success', 'Pago realizado', 'Tu compra ha sido procesada exitosamente');
 
-            // Emitir un evento al servidor para notificar que la compra ha sido pagada
             socket.emit('compraPagada');
         } catch (error) {
             console.error('Error al realizar el pago:', error);
@@ -39,11 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Escuchar el evento `actualizarCarro` del servidor
     socket.on('actualizarCarro', (itemCarro) => {
-        // Actualizar el DOM aquí con la nueva información del carro
-
-        // Por ejemplo, podrías añadir un nuevo elemento al carrito:
         const itemsCarrito = document.getElementById('itemsCarrito');
         const nuevoItem = document.createElement('div');
         nuevoItem.classList.add('CarritoDetalle');
@@ -63,21 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         itemsCarrito.appendChild(nuevoItem);
 
-        // También podrías actualizar el total, etc.
         actualizarTotalCarrito();
     });
 
-    // Escuchar el evento `compraPagada` del servidor
     socket.on('compraPagada', () => {
         console.log('Compra pagada');
-        // Aquí puedes limpiar el carrito o mostrar un mensaje de confirmación
     });
 });
 
 function actualizarTotalCarrito() {
     let total = 0;
     document.querySelectorAll('.h2Carrito').forEach(item => {
-        total += parseFloat(item.textContent.replace('$', '')); // O usa tu lógica para calcular el total
+        total += parseFloat(item.textContent.replace('$', '')); 
     });
     document.querySelector('.precioTotal').textContent = `$${total.toFixed(2)}`;
 }
