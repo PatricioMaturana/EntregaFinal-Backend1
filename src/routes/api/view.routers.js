@@ -1,8 +1,8 @@
 import express from 'express';
 import persistenciaDatos from '../../utils/persistenciaDatos.js';
 import { io } from '../../app.js';
-import Carro from '../../models/Carro.js';  // Quita el espacio entre '../../' y 'models'
-import Producto from '../../models/Producto.js';  // Quita el espacio entre '../../' y 'models'
+import Carro from '../../models/Carro.js'; 
+import Producto from '../../models/Producto.js';  
 
 const router = express.Router();
 
