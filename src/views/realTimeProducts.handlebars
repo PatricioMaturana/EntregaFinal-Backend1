@@ -1,0 +1,71 @@
+<body>
+    <section class="contenedor">
+        <div class="container">
+            <form class="input" id="formCRUD">
+                <h2>Listado de libros, favor registre otros o elimine si lo requiere</h2>
+                <label for="code">Code:</label>
+                <input type="text" id="code" class="chico">
+
+                <label for="title">Title:</label>
+                <input type="text" id="title" class="mediano">
+                
+                <label for="description">Description:</label>
+                <input type="text" id="description" class="grande">
+                
+                <label for="precio">Precio:</label>
+                <input type="number" id="precio" class="chico">
+                
+                <label for="stock">Stock:</label>
+                <input type="number" id="stock" class="chico">
+                
+                <label for="category">Category:</label>
+                <input type="text" id="category" class="mediano">
+                
+                <label for="imagenURL">URL de Imagen:</label>
+                <input type="text" id="imagenURL" class="grande">
+
+                <button type="button" id="btnAgregar" class="btnAgregar">Agregar</button>
+           </form>
+            <div class="item-contenedor" id="card-group">
+                {{#each products}}
+                    <div class="row g-0" id="product-{{this.id}}">
+                        <div class="col-md-4">
+                            <img src="{{this.imagen}}" class="img-fluid rounded-start" width="80px" alt="{{this.title}}">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{this.title}}</h5>
+                                <p class="card-text">Género: {{this.category}}</p>   
+                                <p class="card-text">Precio: {{this.price}}</p>  
+                                <p class="card-text">Code: {{this.code}}</p>    
+                                <p class="card-text">Stock: {{this.stock}}</p>
+                                <p class="card-text">Descripción: {{this.description}}</p>                                    
+                                <button type="button" id="{{this.id}}" class="boton btn-eliminar">Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+         <!-- Carrito de Compras -->
+        <div class="contenedorCarro">            
+            <div class="carrito" id="carrito">
+                <div class="headerCarrito">
+                    <span>Productos seleccionados<i class="fa-solid fa-cart-shopping"></i></span>
+                </div>
+                <div id="itemsCarrito">
+                </div>
+                <div class="carrito-total">
+                    <div class="fila">
+                        <strong>Total</strong>
+                        <span class="precioTotal">
+                            $0.000,00
+                        </span>
+                    </div>
+                    <button class="btn-pagar" id="id-btnPagar">Confirmar y pagar <i class="fa-solid fa-bag-shopping"></i> </button>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

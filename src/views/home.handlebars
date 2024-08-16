@@ -1,0 +1,70 @@
+<body>
+    <section class="contenedor">
+        <div class="container">
+            <div class="item-contenedor" id="card-group">
+                {{#each products}}
+                    <div class="row g-0" id="product-{{this.id}}">
+                        <div class="col-md-4">
+                            <img src="{{this.imagen}}" class="img-fluid rounded-start" width="80px" alt="{{this.title}}">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{this.title}}</h5>
+                                <p class="card-text">Género: {{this.category}}</p>   
+                                <p class="card-text">Precio: {{this.price}}</p>  
+                                <p class="card-text">Code: {{this.code}}</p>    
+                                <p class="card-text">Stock: {{this.stock}}</p>
+                                <p class="card-text">Descripción: {{this.description}}</p>                                    
+                                <button type="button" id={{this.id}} class="boton btnComprar">Comprar</button>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+         <!-- Carrito de Compras -->
+        <div class="contenedorCarro">            
+            <div class="carrito" id="carrito">
+                <div class="headerCarrito">
+                    <span>Productos seleccionados<i class="fa-solid fa-cart-shopping"></i></span>
+                </div>
+                <div id="itemsCarrito">
+                    {{#each itemsCarro}}
+                    <section class="SectionCarro">
+                        <div class="CarritoDetalle">
+                            <div class="carritoImagen">   
+                                <div> 
+                                    <img src="{{this.producto.imagen}}" width="40px" alt="{{this.producto.title}}">
+                                </div>
+                                <p><h2 class="h2Carrito">{{this.producto.title}}</h2></p>
+                                <p><h2 class="h2Carrito">{{this.producto.price}}</h2></p>  
+                            </div>
+                            <div class="selectorCantidad">                                    
+                                <p><i class="fa-solid fa-minus restaCantidad" id="resta-{{this._id}}"></i></p>
+                                <div class="carritoCantidadItem">
+                                    <input class="valorCantidad" id="inp-{{this._id}}" type="text" value="{{this.cantidad}}" disabled>
+                                </div>
+                                <p><i class="fa-solid fa-plus sumaCantidad" id="suma-{{this._id}}"></i></p>
+                                <p><i class="fa-solid fa-trash btn-eliminar" id="eliminar-{{this._id}}"></i></p>
+                            </div>
+                        </div>
+                    </section>
+                    {{/each}}
+                </div>
+                <div class="carrito-total">
+                    <div class="fila">
+                        <strong>Total</strong>
+                        <span class="precioTotal">
+                            $0.000,00
+                        </span>
+                    </div>
+                    <button class="btn-pagar" id="id-btnPagar">Confirmar y pagar <i class="fa-solid fa-bag-shopping"></i> </button>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
+
+
+
