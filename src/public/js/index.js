@@ -5,6 +5,7 @@ const socket = io();  // Establecer la conexión con el servidor
 
 document.addEventListener('DOMContentLoaded', () => {
     // Código para manejar el clic en "Comprar"
+    console.log('gggffffffffffff')
     document.querySelectorAll('.btnComprar').forEach(button => {
         button.addEventListener('click', async (event) => {
             const productId = event.target.id;
@@ -73,3 +74,19 @@ function actualizarTotalCarrito() {
     });
     document.querySelector('.precioTotal').textContent = `$${total.toFixed(2)}`;
 }
+
+/*
+// Función para mostrar notificaciones con Toastify
+function notificacionToastify(text) {
+    Toastify({
+        text: text,
+        duration: 3000,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true,
+        style: {
+            background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+    }).showToast();
+}*/

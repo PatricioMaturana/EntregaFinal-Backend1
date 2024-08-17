@@ -28,8 +28,7 @@ router.get('/', async (req, res) => {
                     code: item.producto.code
                 }
             }));
-    
-             // Renderizar la página con los productos y el carrito
+
         res.render('home', { products, itemsCarro: carroConDetalles });
 
     } catch (error) {
@@ -41,19 +40,24 @@ router.get('/', async (req, res) => {
 
 router.post('/api/carro', async (req, res) => {
     const { productId } = req.body;
+    console.log('Producto ID recibido:', productId);
     try {
-        const itemCarro = await Carro.findOne({ producto: productId, estado: 'pendiente' });
-        const product = await Producto.findById(itemCarro.producto);
+        let itemCarro = await Carro.findOne({ producto: productId, estado: 'pendiente' });
+        console.log('ItemCarro encontrado:', itemCarro);
+        console.log("cccccccccccccccccccccccccccccc ")
 
+     
+        let product = await Producto.findById(productId);
         if (itemCarro) {
+            console.log('entro a IF(itemCarro)')
             itemCarro.cantidad += 1;
             console.log('Itemcarro CAntidad:  ',itemCarro.cantidad)
             await itemCarro.save();
         } else {
+            console.log('ENTROOOOOO');
             itemCarro = new Carro({ producto: productId, cantidad: 1 });
             await itemCarro.save();
-        }
-
+        } 
            // Añadir los detalles del producto a itemCarro
           const carroConDetalles = 
             {
@@ -66,8 +70,6 @@ router.post('/api/carro', async (req, res) => {
                     code: product.code
                 } 
             }
-        //console.log(carroConDetalles.producto)
-        // Emitir un evento a todos los clientes conectados para actualizar el carro
         io.emit('actualizarCarro', carroConDetalles);
         res.json(carroConDetalles);
     } catch (error) {
