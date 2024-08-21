@@ -1,4 +1,5 @@
 import Producto from '../models/Producto.js';
+import Carro from '../models/Carro.js';
 
 class PersistenciaDatos {
 
@@ -24,6 +25,14 @@ class PersistenciaDatos {
     async eliminarProducto(id) {
         try {
             await Producto.findByIdAndDelete(id);
+        } catch (error) {
+            throw new Error('Error al eliminar el producto en MongoDB');
+        }
+    }
+    
+    async eliminarProductoCarro(id) {
+        try {
+            await Carro.findByIdAndDelete(id);
         } catch (error) {
             throw new Error('Error al eliminar el producto en MongoDB');
         }

@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
         res.render('home', { products, itemsCarro: carroConDetalles });
 
     } catch (error) {
-        res.status(500).send('Error al cargar los datos');
+        res.status(500).send('Error al cargar los datos:', error);
     }
 });
 
@@ -41,41 +41,47 @@ router.get('/', async (req, res) => {
 router.post('/api/carro', async (req, res) => {
     const { productId } = req.body;
     console.log('Producto ID recibido:', productId);
+
     try {
         let itemCarro = await Carro.findOne({ producto: productId, estado: 'pendiente' });
-        console.log('ItemCarro encontrado:', itemCarro);
-        console.log("cccccccccccccccccccccccccccccc ")
 
-     
-        let product = await Producto.findById(productId);
         if (itemCarro) {
-            console.log('entro a IF(itemCarro)')
             itemCarro.cantidad += 1;
-            console.log('Itemcarro CAntidad:  ',itemCarro.cantidad)
+            console.log('Nueva cantidad de ItemCarro:', itemCarro.cantidad);
             await itemCarro.save();
         } else {
-            console.log('ENTROOOOOO');
             itemCarro = new Carro({ producto: productId, cantidad: 1 });
+            console.log('Nuevo ItemCarro creado:', itemCarro);
             await itemCarro.save();
-        } 
-           // Añadir los detalles del producto a itemCarro
-          const carroConDetalles = 
-            {
-                ...itemCarro.toObject(),
-                producto: {
-                    _id: product._id,
-                    title: product.title,
-                    price: product.price,
-                    imagen: product.imagen,
-                    code: product.code
-                } 
+        }
+
+        const product = await Producto.findById(productId);
+        if (!product) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+
+        const carroConDetalles = {
+            ...itemCarro.toObject(),
+            producto: {
+                _id: product._id,
+                title: product.title,
+                price: product.price,
+                imagen: product.imagen,
+                code: product.code
             }
+        };
+
+        console.log('Emitir evento actualizarCarro');
         io.emit('actualizarCarro', carroConDetalles);
         res.json(carroConDetalles);
     } catch (error) {
+        console.error('Error al añadir el producto al carro:', error);
         res.status(500).json({ error: 'Error al añadir el producto al carro' });
     }
 });
+
+
+/////////////////////
 
 router.post('/api/carro/pagar', async (req, res) => {
     try {
@@ -119,6 +125,7 @@ router.post('/api/products', async (req, res) => {
 
 router.delete('/api/products/:id', async (req, res) => {
     const idProducto = req.params.id;
+    console.log('Router view: ',idProducto);
     try {
         await persistenciaDatos.eliminarProducto(idProducto);
         io.emit('deleteProduct', idProducto);
@@ -127,5 +134,18 @@ router.delete('/api/products/:id', async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar el producto' });
     }
 });
-
+//////////////////////////////////////////////////////////////////////////////
+router.delete('/api/carro/:id', async (req, res) => {
+    const id = req.params.id;
+    console.log('Producto ID ELIMINAR:', id);
+    try {
+        await persistenciaDatos.eliminarProductoCarro(id);
+        io.emit('carroActualizado', id);       
+        res.json({ message: 'Producto eliminado del carro' });
+        //>>>>>>>>>>>>>>>>>>
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar el producto del carro' });
+    }
+});
+//////////////////////////////////////////////////////////////////////////////
 export default router;
