@@ -7,16 +7,9 @@ import Producto from '../../models/Producto.js';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    console.log('metodo GETTTT')
     try {
         const products = await persistenciaDatos.cargarProductos();
-      //  res.render('home', { products });
-
- //       try {
-            // Obtener todos los productos en estado pendiente en el carrito
             const itemsCarro = await Carro.find({ estado: 'pendiente' }).populate('producto');
-    
-            // Mapear los items del carro para incluir los detalles del producto
             const carroConDetalles = itemsCarro.map(item => ({
                 _id: item._id,
                 cantidad: item.cantidad,
@@ -28,7 +21,7 @@ router.get('/', async (req, res) => {
                     code: item.producto.code
                 }
             }));
-
+           
         res.render('home', { products, itemsCarro: carroConDetalles });
 
     } catch (error) {
@@ -36,44 +29,36 @@ router.get('/', async (req, res) => {
     }
 });
 
-/////////////////////
-
 router.post('/api/carro', async (req, res) => {
     const { productId } = req.body;
     console.log('Producto ID recibido:', productId);
 
-    try {
-        let itemCarro = await Carro.findOne({ producto: productId, estado: 'pendiente' });
-
+    try {;
+        let itemCarro = await Carro.findOne({ producto: productId, estado: 'pendiente' }).populate('producto');
         if (itemCarro) {
-            itemCarro.cantidad += 1;
-            console.log('Nueva cantidad de ItemCarro:', itemCarro.cantidad);
-            await itemCarro.save();
+            console.log('Producto ya en el carro');
         } else {
             itemCarro = new Carro({ producto: productId, cantidad: 1 });
-            console.log('Nuevo ItemCarro creado:', itemCarro);
             await itemCarro.save();
-        }
-
-        const product = await Producto.findById(productId);
-        if (!product) {
-            return res.status(404).json({ error: 'Producto no encontrado' });
-        }
-
-        const carroConDetalles = {
-            ...itemCarro.toObject(),
-            producto: {
-                _id: product._id,
-                title: product.title,
-                price: product.price,
-                imagen: product.imagen,
-                code: product.code
+        
+            const product = await Producto.findById(productId);
+            if (!product) {
+                return res.status(404).json({ error: 'Producto no encontrado' });
             }
-        };
 
-        console.log('Emitir evento actualizarCarro');
-        io.emit('actualizarCarro', carroConDetalles);
-        res.json(carroConDetalles);
+            const carroConDetalles = {
+                ...itemCarro.toObject(),
+                producto: {
+                    _id: product._id,
+                    title: product.title,
+                    price: product.price,
+                    imagen: product.imagen,
+                    code: product.code
+                }
+            };
+            io.emit('actualizarCarro', carroConDetalles);
+            res.json(carroConDetalles);
+        }       
     } catch (error) {
         console.error('Error al añadir el producto al carro:', error);
         res.status(500).json({ error: 'Error al añadir el producto al carro' });
@@ -87,7 +72,6 @@ router.post('/api/carro/pagar', async (req, res) => {
     try {
         await Carro.updateMany({ estado: 'pendiente' }, { estado: 'pagado' });
 
-        // Emitir un evento para notificar que la compra ha sido pagada
         io.emit('compraPagada');
 
         res.json({ message: 'Compra realizada exitosamente' });
@@ -96,11 +80,8 @@ router.post('/api/carro/pagar', async (req, res) => {
     }
 });
 
-
 ////////////////////
-
-
-
+/*
 router.get('/realtimeproducts', async (req, res) => {
     try {
         const products = await persistenciaDatos.cargarProductos();
@@ -123,6 +104,7 @@ router.post('/api/products', async (req, res) => {
     }
 });
 
+
 router.delete('/api/products/:id', async (req, res) => {
     const idProducto = req.params.id;
     console.log('Router view: ',idProducto);
@@ -133,7 +115,7 @@ router.delete('/api/products/:id', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar el producto' });
     }
-});
+});*/
 //////////////////////////////////////////////////////////////////////////////
 router.delete('/api/carro/:id', async (req, res) => {
     const id = req.params.id;

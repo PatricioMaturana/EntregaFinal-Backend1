@@ -91,15 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
     socket.on('actualizarCarro', (itemCarro) => {
-        const itemsCarrito = document.getElementById('itemsCarrito');
-        let itemExistente = document.getElementById(`product-${itemCarro.producto._id}`);
-        
-       
-        if (itemExistente) {
-            console.log('El producto ya está en el carrito');
-            return;
-        }
-    
+        const itemsCarrito = document.getElementById('itemsCarrito');  
         const nuevoItem = document.createElement('div');
         nuevoItem.classList.add('CarritoDetalle');
         nuevoItem.id = `product-${itemCarro.producto._id}`;
