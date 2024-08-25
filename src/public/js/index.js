@@ -1,6 +1,4 @@
-//import notificacionToastify from '../../utils/alertas.js'; 
-//import alertaPopUp from '../../utils/alertas.js'; 
-//import { notificacionToastify, alertaPopUp } from '../utils/alertas.js';  
+//import alertaPopUp from '../../utils/alertas.js'; ;  
 const socket = io();  // Establecer la conexión con el servidor
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -67,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="${itemCarro.producto.imagen}" width="40px" alt="${itemCarro.producto.title}">
                     </div>
                     <p><h2 class="h2Carrito">${itemCarro.producto.title}</h2></p>
-                    <p><h2  id="precio" class="h2Carrito">${itemCarro.producto.price}</h2></p>
+                    <p><h2 class="h2Carrito precio">${itemCarro.producto.price}</h2></p>
                 </div>
                 <div class="selectorCantidad">                                    
                     <p><i class="fa-solid fa-minus restaCantidad" id="resta-${itemCarro._id}"></i></p>
@@ -117,11 +115,20 @@ async function eliminaFilaCarro(itemCarroId) {
 };
 function actualizarTotalCarrito() {
     let total = 0;
-    document.querySelectorAll('precio').forEach(item => {
-        total += parseFloat(item.textContent.replace('$', '')); 
+    console.log("actualizarTotalCarrito");
+    
+    document.querySelectorAll('.precio').forEach(item => {
+        const precio = parseFloat(item.textContent.replace('$', '').trim());
+        console.log("precio: ", precio);
+        if (!isNaN(precio)) {
+            total += precio;
+        }
     });
+
+    // Actualizar el total en el DOM
     document.querySelector('.precioTotal').textContent = `$${total.toFixed(2)}`;
 }
+
 
 
 
