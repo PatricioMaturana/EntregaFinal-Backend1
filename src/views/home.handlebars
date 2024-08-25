@@ -30,8 +30,8 @@
                 </div>
                 <div id="itemsCarrito">
                     {{#each itemsCarro}}
+                   <div id="product-{{this._id}}" class="CarritoDetalle">
                     <section class="SectionCarro">
-                        <div class="CarritoDetalle">
                             <div class="carritoImagen">   
                                 <div> 
                                     <img src="{{this.producto.imagen}}" width="40px" alt="{{this.producto.title}}">
@@ -45,10 +45,11 @@
                                     <input class="valorCantidad" id="inp-{{this._id}}" type="text" value="{{this.cantidad}}" disabled>
                                 </div>
                                 <p><i class="fa-solid fa-plus sumaCantidad" id="suma-{{this._id}}"></i></p>
-                                <p><i class="fa-solid fa-trash btn-eliminar" id="eliminar-{{this._id}}"></i></p>
+                                <p><i class="fa-solid fa-trash btn-eliminar" id="eliminar-{{this._id}}" onclick= "eliminaFilaCarro({{itemCarro._id}})"></i></p>
+                              
                             </div>
-                        </div>
                     </section>
+                    </div>
                     {{/each}}
                 </div>
                 <div class="carrito-total">

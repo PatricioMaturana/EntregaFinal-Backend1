@@ -33,40 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
 
-   
-    document.querySelectorAll('.btn-eliminar').forEach(button => {
-        button.addEventListener('click', async (event) => {
-            const itemId = event.target.id.split('-')[1];
-            if (!itemId) {
-                console.error('No se pudo obtener el ID del artículo para eliminar');
-                return;
-            }
-            try {
-                const response = await fetch(`/api/carro/${itemId}`, {
-                    method: 'DELETE'
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error al eliminar el artículo del carro');
-                }
-
-                const data = await response.json();
-                console.log('Articulo eliminado del carro:', data);
-
-                // Eliminar del DOM
-                const itemRemover = document.getElementById(`product-${itemId}`);
-                if (itemRemover) {
-                    itemRemover.remove();
-                }
-                actualizarTotalCarrito();
-                socket.emit('productoEliminado', data);
-            } catch (error) {
-                console.error('Error al eliminar el artículo del carro:', error);
-            }
-        });
-    });
-
-
     document.getElementById('id-btnPagar').addEventListener('click', async () => {
         try {
             const response = await fetch('/api/carro/pagar', {
@@ -94,21 +60,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const itemsCarrito = document.getElementById('itemsCarrito');  
         const nuevoItem = document.createElement('div');
         nuevoItem.classList.add('CarritoDetalle');
-        nuevoItem.id = `product-${itemCarro.producto._id}`;
+        nuevoItem.id = `product-${itemCarro._id}`;
         nuevoItem.innerHTML = `
-            <div class="carritoImagen">   
-                <img src="${itemCarro.producto.imagen}" width="40px" alt="${itemCarro.producto.title}">
-                <p><h2 class="h2Carrito">${itemCarro.producto.title}</h2></p>
-                <p><h2 class="h2Carrito">${itemCarro.producto.price}</h2></p>
-            </div>
-            <div class="selectorCantidad">                                    
-                <p><i class="fa-solid fa-minus restaCantidad" id="resta-${itemCarro.producto._id}"></i></p>
-                <div class="carritoCantidadItem"><input class="valorCantidad" id="inp-${itemCarro.producto._id}" type="text" value="${itemCarro.cantidad}" disabled></div>
-                <p><i class="fa-solid fa-plus sumaCantidad" id="suma-${itemCarro.producto._id}"></i></p>
-                <p><i class="fa-solid fa-trash btn-eliminar" id="eliminar-${itemCarro.producto._id}"></i></p>
-            </div>
+            <section class="SectionCarro">
+                <div class="carritoImagen">   
+                    <div>
+                        <img src="${itemCarro.producto.imagen}" width="40px" alt="${itemCarro.producto.title}">
+                    </div>
+                    <p><h2 class="h2Carrito">${itemCarro.producto.title}</h2></p>
+                    <p><h2 class="h2Carrito">${itemCarro.producto.price}</h2></p>
+                </div>
+                <div class="selectorCantidad">                                    
+                    <p><i class="fa-solid fa-minus restaCantidad" id="resta-${itemCarro._id}"></i></p>
+                    <div class="carritoCantidadItem"><input class="valorCantidad" id="inp-${itemCarro._id}" type="text" value="${itemCarro.cantidad}" disabled></div>
+                    <p><i class="fa-solid fa-plus sumaCantidad" id="suma-${itemCarro._id}"></i></p>
+                    <p><i class="fa-solid fa-trash btn-eliminar" id="eliminar-${itemCarro._id}" onclick="eliminaFilaCarro('${itemCarro._id}')"></i></p>
+                </div>
+            </section>
         `;
-    
         itemsCarrito.appendChild(nuevoItem);
     
         actualizarTotalCarrito();
@@ -119,15 +88,44 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Compra pagada');
     });
 
-    socket.on('carroActualizado', (itemCarro) => {
-        const itemToRemove = document.getElementById(`product-${itemCarro._id}`);
+    socket.on('deleteProductoDelcarro', (itemCarro) => {
+        let itemToRemove = document.getElementById(`product-${itemCarro}`);
+        console.log('itemToREmove: ',itemToRemove, 'itemcarrooooo: ', itemCarro);
         if (itemToRemove) {
             itemToRemove.remove();
         }
-        actualizarTotalCarrito();
+      //  actualizarTotalCarrito();
     });
 });
 
+
+async function eliminaFilaCarro(itemCarroId) {
+    const itemId = event.target.id.split('-')[1];
+    if (!itemId) {
+        console.error('No se pudo obtener el ID del artículo para eliminar');
+        return;
+    }
+    try {
+        const response = await fetch(`/api/carro/${itemId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al eliminar el artículo del carro');
+        }
+
+        const data = await response.json();
+        console.log('Articulo eliminado del carro:', data);
+        const itemRemover = document.getElementById(`product-${itemId}`);
+        if (itemRemover) {
+            itemRemover.remove();
+        }
+        actualizarTotalCarrito();
+        socket.emit('productoEliminado', data);
+    } catch (error) {
+        console.error('Error al eliminar el artículo del carro:', error);
+    }
+};
 function actualizarTotalCarrito() {
     let total = 0;
     document.querySelectorAll('.h2Carrito').forEach(item => {

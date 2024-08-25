@@ -1,5 +1,4 @@
 import express from 'express';
-import persistenciaDatos from '../../utils/persistenciaDatos.js';
 import { io } from '../../app.js';
 import Carro from '../../models/Carro.js'; 
 import Producto from '../../models/Producto.js';  
@@ -8,20 +7,20 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const products = await persistenciaDatos.cargarProductos();
+        const products = await Producto.find();
             const itemsCarro = await Carro.find({ estado: 'pendiente' }).populate('producto');
             const carroConDetalles = itemsCarro.map(item => ({
                 _id: item._id,
                 cantidad: item.cantidad,
                 producto: {
-                    _id: item.producto._id,
+                    producto: item.producto._id,
                     title: item.producto.title,
                     price: item.producto.price,
                     imagen: item.producto.imagen,
                     code: item.producto.code
                 }
             }));
-           
+           console.log('GETTTTTTTTTTTTTTTTTTTTTTTTT::  ',carroConDetalles);
         res.render('home', { products, itemsCarro: carroConDetalles });
 
     } catch (error) {
@@ -33,7 +32,7 @@ router.post('/api/carro', async (req, res) => {
     const { productId } = req.body;
     console.log('Producto ID recibido:', productId);
 
-    try {;
+    try {
         let itemCarro = await Carro.findOne({ producto: productId, estado: 'pendiente' }).populate('producto');
         if (itemCarro) {
             console.log('Producto ya en el carro');
@@ -56,6 +55,7 @@ router.post('/api/carro', async (req, res) => {
                     code: product.code
                 }
             };
+            console.log('carroConDetalles: ',carroConDetalles);
             io.emit('actualizarCarro', carroConDetalles);
             res.json(carroConDetalles);
         }       
@@ -64,9 +64,6 @@ router.post('/api/carro', async (req, res) => {
         res.status(500).json({ error: 'Error al añadir el producto al carro' });
     }
 });
-
-
-/////////////////////
 
 router.post('/api/carro/pagar', async (req, res) => {
     try {
@@ -80,54 +77,20 @@ router.post('/api/carro/pagar', async (req, res) => {
     }
 });
 
-////////////////////
-/*
-router.get('/realtimeproducts', async (req, res) => {
-    try {
-        const products = await persistenciaDatos.cargarProductos();
-        res.render('realTimeProducts', { products });
-    } catch (error) {
-        res.status(500).send('Error al cargar los datos');
-    }
-});
-
-// API Routes
-router.post('/api/products', async (req, res) => {
-    let { title, description, code, price, stock, category, imagen } = req.body;
-
-    try {
-        const newProduct = await persistenciaDatos.crearProducto({ title, description, code, price, stock, category, imagen });
-        io.emit('newProduct', newProduct);
-        res.json(newProduct);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al guardar el producto' });
-    }
-});
-
-
-router.delete('/api/products/:id', async (req, res) => {
-    const idProducto = req.params.id;
-    console.log('Router view: ',idProducto);
-    try {
-        await persistenciaDatos.eliminarProducto(idProducto);
-        io.emit('deleteProduct', idProducto);
-        res.json({ message: 'Producto eliminado' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar el producto' });
-    }
-});*/
-//////////////////////////////////////////////////////////////////////////////
 router.delete('/api/carro/:id', async (req, res) => {
     const id = req.params.id;
     console.log('Producto ID ELIMINAR:', id);
     try {
-        await persistenciaDatos.eliminarProductoCarro(id);
-        io.emit('carroActualizado', id);       
+        try {
+            await Carro.findByIdAndDelete(id);
+        } catch (error) {
+            throw new Error('Error al eliminar el producto en MongoDB');
+        }
+        io.emit('deleteProductoDelcarro', id);    
+        console.log('deleteProductoDelcarro:', id);   
         res.json({ message: 'Producto eliminado del carro' });
-        //>>>>>>>>>>>>>>>>>>
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar el producto del carro' });
     }
 });
-//////////////////////////////////////////////////////////////////////////////
 export default router;
