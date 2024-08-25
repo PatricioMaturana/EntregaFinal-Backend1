@@ -4,7 +4,7 @@
 const socket = io();  // Establecer la conexión con el servidor
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Código para manejar el clic en "Comprar"
+
     document.querySelectorAll('.btnComprar').forEach(button => {
         button.addEventListener('click', async (event) => {
             const productId = event.target.id;
@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    
 
     document.getElementById('id-btnPagar').addEventListener('click', async () => {
         try {
@@ -41,20 +40,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 }
             });
-
+    
             if (!response.ok) {
                 throw new Error('Error al realizar el pago');
             }
-
+    
             const data = await response.json();
             console.log(data.message);
-
+    
             socket.emit('compraPagada');
         } catch (error) {
             console.error('Error al realizar el pago:', error);
         }
     });
-
+    
     
     socket.on('actualizarCarro', (itemCarro) => {
         const itemsCarrito = document.getElementById('itemsCarrito');  
@@ -68,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="${itemCarro.producto.imagen}" width="40px" alt="${itemCarro.producto.title}">
                     </div>
                     <p><h2 class="h2Carrito">${itemCarro.producto.title}</h2></p>
-                    <p><h2 class="h2Carrito">${itemCarro.producto.price}</h2></p>
+                    <p><h2  id="precio" class="h2Carrito">${itemCarro.producto.price}</h2></p>
                 </div>
                 <div class="selectorCantidad">                                    
                     <p><i class="fa-solid fa-minus restaCantidad" id="resta-${itemCarro._id}"></i></p>
@@ -87,17 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('compraPagada', () => {
         console.log('Compra pagada');
     });
-
-    socket.on('deleteProductoDelcarro', (itemCarro) => {
-        let itemToRemove = document.getElementById(`product-${itemCarro}`);
-        console.log('itemToREmove: ',itemToRemove, 'itemcarrooooo: ', itemCarro);
-        if (itemToRemove) {
-            itemToRemove.remove();
-        }
-      //  actualizarTotalCarrito();
-    });
 });
-
 
 async function eliminaFilaCarro(itemCarroId) {
     const itemId = event.target.id.split('-')[1];
@@ -115,12 +104,12 @@ async function eliminaFilaCarro(itemCarroId) {
         }
 
         const data = await response.json();
-        console.log('Articulo eliminado del carro:', data);
         const itemRemover = document.getElementById(`product-${itemId}`);
         if (itemRemover) {
             itemRemover.remove();
         }
         actualizarTotalCarrito();
+        notificacionToastify('Producto eliminado');
         socket.emit('productoEliminado', data);
     } catch (error) {
         console.error('Error al eliminar el artículo del carro:', error);
@@ -128,14 +117,14 @@ async function eliminaFilaCarro(itemCarroId) {
 };
 function actualizarTotalCarrito() {
     let total = 0;
-    document.querySelectorAll('.h2Carrito').forEach(item => {
+    document.querySelectorAll('precio').forEach(item => {
         total += parseFloat(item.textContent.replace('$', '')); 
     });
     document.querySelector('.precioTotal').textContent = `$${total.toFixed(2)}`;
 }
 
 
-/*
+
 // Función para mostrar notificaciones con Toastify
 function notificacionToastify(text) {
     Toastify({
@@ -149,4 +138,4 @@ function notificacionToastify(text) {
             background: "linear-gradient(to right, #00b09b, #96c93d)",
         },
     }).showToast();
-}*/
+}

@@ -20,7 +20,6 @@ router.get('/', async (req, res) => {
                     code: item.producto.code
                 }
             }));
-           console.log('GETTTTTTTTTTTTTTTTTTTTTTTTT::  ',carroConDetalles);
         res.render('home', { products, itemsCarro: carroConDetalles });
 
     } catch (error) {
@@ -55,7 +54,6 @@ router.post('/api/carro', async (req, res) => {
                     code: product.code
                 }
             };
-            console.log('carroConDetalles: ',carroConDetalles);
             io.emit('actualizarCarro', carroConDetalles);
             res.json(carroConDetalles);
         }       
@@ -86,8 +84,7 @@ router.delete('/api/carro/:id', async (req, res) => {
         } catch (error) {
             throw new Error('Error al eliminar el producto en MongoDB');
         }
-        io.emit('deleteProductoDelcarro', id);    
-        console.log('deleteProductoDelcarro:', id);   
+        io.emit('deleteProductoDelcarro', id);  
         res.json({ message: 'Producto eliminado del carro' });
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar el producto del carro' });
