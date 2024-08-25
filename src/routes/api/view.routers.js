@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
                 producto: {
                     producto: item.producto._id,
                     title: item.producto.title,
-                    price: item.producto.price,
+                    price: item.producto.price.toLocaleString('es-CL'),
                     imagen: item.producto.imagen,
                     code: item.producto.code
                 }

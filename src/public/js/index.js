@@ -1,8 +1,9 @@
 //import alertaPopUp from '../../utils/alertas.js'; ;  
 const socket = io();  // Establecer la conexión con el servidor
 
-document.addEventListener('DOMContentLoaded', () => {
 
+document.addEventListener('DOMContentLoaded', () => {
+    actualizarTotalCarrito();
     document.querySelectorAll('.btnComprar').forEach(button => {
         button.addEventListener('click', async (event) => {
             const productId = event.target.id;
@@ -50,8 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error al realizar el pago:', error);
         }
-    });
-    
+    });    
     
     socket.on('actualizarCarro', (itemCarro) => {
         const itemsCarrito = document.getElementById('itemsCarrito');  
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="${itemCarro.producto.imagen}" width="40px" alt="${itemCarro.producto.title}">
                     </div>
                     <p><h2 class="h2Carrito">${itemCarro.producto.title}</h2></p>
-                    <p><h2 class="h2Carrito precio">${itemCarro.producto.price}</h2></p>
+                    <p><h2 class="h2Carrito precio">${itemCarro.producto.price.toLocaleString('es-CL')}</h2></p>
                 </div>
                 <div class="selectorCantidad">                                    
                     <p><i class="fa-solid fa-minus restaCantidad" id="resta-${itemCarro._id}"></i></p>
@@ -116,20 +116,14 @@ async function eliminaFilaCarro(itemCarroId) {
 function actualizarTotalCarrito() {
     let total = 0;
     console.log("actualizarTotalCarrito");
-    
     document.querySelectorAll('.precio').forEach(item => {
-        const precio = parseFloat(item.textContent.replace('$', '').trim());
-        console.log("precio: ", precio);
+        const precio = parseFloat(item.textContent.replace('.', '').trim());
         if (!isNaN(precio)) {
             total += precio;
         }
     });
-
-    // Actualizar el total en el DOM
-    document.querySelector('.precioTotal').textContent = `$${total.toFixed(2)}`;
+    document.querySelector('.precioTotal').textContent = total.toLocaleString('es-CL');
 }
-
-
 
 
 // Función para mostrar notificaciones con Toastify
